@@ -1,0 +1,92 @@
+@baseUrl = http://localhost:8085
+@defaultStart = 2024-01-01
+@defaultEnd = 2024-01-14
+@client1Start = 2019-08-27
+@client1End = 2019-09-10
+
+### Token
+GET {{baseUrl}}/api/enedis/token
+
+###
+### Client 0 - Consommation, courbe active, Linky debut de deploiement
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=22516914714270
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=22516914714270
+
+###
+### Client 1 - Consommation, courbe active, mise en service 2019-08-27
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=11453290002823
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{client1Start}}&end={{client1End}}&usagePointId=11453290002823
+
+###
+### Client 2 - Consommation, courbe non active
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=32320647321714
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=32320647321714
+
+###
+### Client 3 - 1 point conso + 1 point prod, courbes actives
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=12345678901234
+
+###
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=10284856584123
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=12345678901234
+
+###
+GET {{baseUrl}}/api/enedis/metering/production-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=10284856584123
+
+###
+### Client 4 - Conso, courbe active, trous de donnees mardi/mercredi
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=42900589957123
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=42900589957123
+
+###
+### Client 5 - Production, courbe active
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=24880057139941
+
+###
+GET {{baseUrl}}/api/enedis/metering/production-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=24880057139941
+
+###
+### Client 6 - Auto-consommation, courbes conso + prod actives
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=12655648759651
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=12655648759651
+
+###
+GET {{baseUrl}}/api/enedis/metering/production-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=12655648759651
+
+###
+### Client 7 - 3 points de consommation, courbes actives
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=64975835695673
+
+###
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=63695879465986
+
+###
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=22315546958763
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=64975835695673
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=63695879465986
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=22315546958763
+
+###
+### Client 8 - Consentement revoque immediatement (attendu: acces refuse)
+GET {{baseUrl}}/api/enedis/customers/contracts?usagePointId=26584978546985
+
+###
+GET {{baseUrl}}/api/enedis/metering/consumption-load-curve?start={{defaultStart}}&end={{defaultEnd}}&usagePointId=26584978546985
