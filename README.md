@@ -30,7 +30,7 @@ Defined in `src/main/resources/application.properties` through `energy.*` proper
 
 ## API endpoints
 
-Base path: `http://localhost:8085`
+Base path: `https://localhost:8085`
 
 | Method | Path | Query params | Description |
 | --- | --- | --- | --- |
@@ -47,14 +47,18 @@ Base path: `http://localhost:8085`
 ./gradlew bootRun
 ```
 
-Home page (static): `http://localhost:8085/`  
-Swagger UI: `http://localhost:8085/swagger-ui/index.html` (uses `/openapi3.yaml`).
+Home page (static): `https://localhost:8085/`  
+Swagger UI: `https://localhost:8085/swagger-ui/index.html` (uses `/openapi3.yaml`).
 
 ## Build, test, and OpenAPI generation
 
 ```bash
+# Dev (http — default)
 ./gradlew test
+
+# Prod (https)
+./gradlew test -PserverScheme=https
 ```
 
-During `test`, task `openapi3` runs and generates `build/api-spec/openapi3.yaml`, then copies it to `build/resources/main/static/openapi3.yaml`.
+During `test`, task `openapi3` runs and generates `build/api-spec/openapi3.yaml` using the configured scheme, then copies it to `build/resources/main/static/openapi3.yaml`.
 

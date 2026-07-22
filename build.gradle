@@ -4,7 +4,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.jetbrains.kotlin.jvm'
     id "org.jetbrains.kotlin.plugin.spring" version '2.4.0'
-    id 'com.epages.restdocs-api-spec' version '0.20.1'
 }
 
 group = 'com.devmind'
@@ -35,29 +34,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 }
 
-def snippetsDir = file("$buildDir/generated-snippets")
-
 tasks.named('test') {
     useJUnitPlatform()
-    outputs.dir snippetsDir
-    finalizedBy 'openapi3'
-}
-
-openapi3 {
-    title = 'Energy API'
-    description = 'REST API documentation generated from Spring REST Docs snippets'
-    version = project.version
-    format = 'yaml'
-    server = 'http://localhost:8085'
-}
-
-tasks.register('copyOpenapiSpec', Copy) {
-    dependsOn 'openapi3'
-    from("$buildDir/api-spec")
-    include('openapi3.yaml')
-    into("$buildDir/resources/main/static")
-}
-
-tasks.matching { it.name == 'openapi3' }.configureEach {
-    finalizedBy tasks.named('copyOpenapiSpec')
 }
