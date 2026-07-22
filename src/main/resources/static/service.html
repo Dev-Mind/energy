@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dev-Mind Energy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body>
+<main class="container py-5">
+    <h1 class="display-5 fw-semibold">Dev-Mind Energy</h1>
+    <p>
+        Vous venez d'accepter que notre service se connecte à votre compteur pour restituer des données.
+    </p>
+    <p>
+        Vous pouvez maintenant récupérer les données de Consomation et de production via notre API. Elle a été conçue
+        avec la volonté de garantir une sécurité de vos données. Aucune donnée n'est stockée et notre application
+        est installée sur des serveurs européens.
+
+    </p>
+
+    <h2>📅 Fréquence des données</h2>
+    <ul>
+        <li>Les compteurs Linky envoient les données une fois par jour</li>
+        <li>Les données d'une journée sont disponibles le lendemain vers 8h (parfois 9h-10h).</li>
+        <li>En cas d'absence à J+1 avant 10h, elles arrivent généralement à J+2 vers 8h.</li>
+    </ul>
+
+    <h2>🚦 Limites d'appels (quotas Enedis)</h2>
+    <table class="table">
+        <tr>
+            <th>Limite</th>
+            <th>Valeur</th>
+        </tr>
+        <tr>
+            <td>Requêtes / seconde </td>
+            <td>5</td>
+        </tr>
+        <tr>
+            <td>Requêtes / heure </td>
+            <td>10000</td>
+        </tr>
+    </table>
+
+    <h2>✅ Bonnes pratiques</h2>
+    <ul>
+        <li>1 seule requête par jour, entre 6h et 10h, à un horaire aléatoire (ex. 8h34 plutôt que 8h00 pile).</li>
+        <li>Si pas de données → réessayer en début d'après-midi.</li>
+        <li>Toujours rien → attendre le lendemain.</li>
+        <li>Pour un gros historique → utiliser Conso downloader plutôt que des appels répétés.</li>
+    </ul>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+</html>
