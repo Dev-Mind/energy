@@ -38,8 +38,10 @@ Base path: `https://localhost:8085`
 | `GET` | `/api/enedis/customers/contracts` | `usagePointId` | Returns contracts for a usage point (mapped from Enedis customer contract payload). |
 | `GET` | `/api/enedis/metering/consumption-load-curve` | `start`, `end`, `usagePointId` | Returns consumption load curve for the period. |
 | `GET` | `/api/enedis/metering/production-load-curve` | `start`, `end`, `usagePointId` | Returns production load curve for the period. |
+| `GET` | `/api/enedis/metering/data` | `prm`, `dataType`, `startDate`, `endDate` | Returns consumption or production data for a PRM after retrieving the Enedis token server-side. |
 
 `start` and `end` are `LocalDate` values (ISO-8601, e.g. `2026-07-01`).
+`startDate` and `endDate` use the UI format `YYYY-DD-MM` (e.g. `2026-24-07`), and `dataType` must be `consumption` or `production`.
 
 ## Run locally
 
@@ -61,4 +63,3 @@ Swagger UI: `https://localhost:8085/swagger-ui/index.html` (uses `/openapi3.yaml
 ```
 
 During `test`, task `openapi3` runs and generates `build/api-spec/openapi3.yaml` using the configured scheme, then copies it to `build/resources/main/static/openapi3.yaml`.
-
