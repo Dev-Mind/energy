@@ -20,7 +20,7 @@ class AuthenticationApi(private val tokenService: TokenService, private val prop
     fun redirectToEnedisAccount(): RedirectView {
         val clientId = properties.clientId
         val duration = properties.duration
-        val state = "devmind-energy-app"
+        val state = "XDEV123"
         return RedirectView(
             "https://mon-compte-particulier.enedis.fr/dataconnect/v1/oauth2/authorize?client_id=$clientId&duration=$duration&response_type=code&state=$state"
         )
