@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class EnergyProperties(
     var baseUrl: String,
     var clientId: String,
+    var duration: String,
     var secret: String,
     var oauthPath: String
 )
