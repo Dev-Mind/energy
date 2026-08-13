@@ -5,6 +5,7 @@ import com.devmind.energy.service.dto.ApiException
 import com.devmind.energy.service.dto.MeterReadingResponse
 import java.net.URI
 import java.time.LocalDate
+import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
@@ -17,6 +18,9 @@ class DataConnectService(
     private val restClient: RestClient,
     private val tokenService: TokenService
 ) {
+    companion object {
+        private val logger = LoggerFactory.getLogger(DataConnectService::class.java)
+    }
 
     fun getConsumptionLoadCurve(start: LocalDate, end: LocalDate, usagePointId: kotlin.String): MeterReadingResponse? {
         return getMeterReading("/metering_data_clc/v5/consumption_load_curve", start, end, usagePointId)
@@ -65,7 +69,11 @@ class DataConnectService(
                 .retrieve()
                 .body(responseType)
         } catch (exception: RestClientResponseException) {
+            logger.error("Error while calling Enedis endpoint: status={}", exception.statusCode.value(), exception)
             throw ApiException(exception.statusCode, exception.responseBodyAsString)
+        } catch (exception: Exception) {
+            logger.error("Unexpected error while calling Enedis endpoint", exception)
+            throw exception
         }
     }
 }

@@ -7,6 +7,7 @@ Spring Boot (Kotlin) service that proxies Enedis Data Connect APIs for token ret
 - Java 21
 - Kotlin 2.4
 - Spring Boot 4.1 (Web MVC)
+- Spring Data JPA + H2 (file database)
 - `RestClient` for Enedis outbound calls
 - springdoc OpenAPI UI + REST Docs / epages OpenAPI generation
 
@@ -21,6 +22,9 @@ Defined in `src/main/resources/application.properties` through `energy.*` proper
 | `energy.secret` | `HOME_AUTOMATION_ENEDIS_SECRET` | `replace-with-secret` |
 | `energy.oauth-path` | `HOME_AUTOMATION_ENEDIS_OAUTH_PATH` | `/oauth2/v3/token` |
 | `server.port` | — | `8085` |
+| `spring.datasource.url` | `ENERGY_DB_URL` | `jdbc:h2:file:./data/energy-users;AUTO_SERVER=TRUE` |
+| `spring.datasource.username` | `ENERGY_DB_USERNAME` | `sa` |
+| `spring.datasource.password` | `ENERGY_DB_PASSWORD` | *(empty)* |
 
 ## Application flow
 
@@ -35,6 +39,9 @@ Base path: `https://localhost:8085`
 | Method | Path | Query params | Description |
 | --- | --- | --- | --- |
 | `GET` | `/api/enedis/token` | — | Returns current Enedis OAuth token (`access_token`, `scope`, `token_type`, `expires_in`). |
+| `GET` | `/api/enedis/redirect` | `state`, `usage_point_id`, `code` | Handles Enedis redirect callback, parses PRMs (`usage_point_id` separated by `;`) and returns the computed consent validity window. |
+| `POST` | `/api/enedis/consents` | — | Creates or updates user consent data (`userAccountId`, consent flag, validity range, associated PRMs). |
+| `GET` | `/api/enedis/consents/{userAccountId}` | — | Returns consent data persisted for a user account. |
 | `GET` | `/api/enedis/customers/contracts` | `usagePointId` | Returns contracts for a usage point (mapped from Enedis customer contract payload). |
 | `GET` | `/api/enedis/metering/consumption-load-curve` | `start`, `end`, `usagePointId` | Returns consumption load curve for the period. |
 | `GET` | `/api/enedis/metering/production-load-curve` | `start`, `end`, `usagePointId` | Returns production load curve for the period. |

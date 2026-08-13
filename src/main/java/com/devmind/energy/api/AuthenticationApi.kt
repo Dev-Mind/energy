@@ -1,17 +1,23 @@
 package com.devmind.energy.api
 
 import com.devmind.energy.EnergyProperties
+import com.devmind.energy.service.EnedisRedirectService
 import com.devmind.energy.service.TokenService
+import com.devmind.energy.service.dto.EnedisRedirectResponseDto
 import com.devmind.energy.service.dto.EnedisTokenResponseDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.view.RedirectView
 
 @RestController
 @RequestMapping("/api/enedis")
-class AuthenticationApi(private val tokenService: TokenService, private val properties: EnergyProperties) {
+class AuthenticationApi(
+    private val tokenService: TokenService,
+    private val properties: EnergyProperties,
+    private val enedisRedirectService: EnedisRedirectService
+) {
     @GetMapping("/token")
     fun token(): EnedisTokenResponseDto =
         tokenService.token ?: throw IllegalArgumentException("Token not found")
@@ -25,4 +31,12 @@ class AuthenticationApi(private val tokenService: TokenService, private val prop
             "https://mon-compte-particulier.enedis.fr/dataconnect/v1/oauth2/authorize?client_id=$clientId&duration=$duration&response_type=code&state=$state"
         )
     }
+
+    @GetMapping("/redirect", "/refirect")
+    fun handleEnedisRedirect(
+        @RequestParam state: String,
+        @RequestParam("usage_point_id") usagePointId: String,
+        @RequestParam code: String
+    ): EnedisRedirectResponseDto =
+        enedisRedirectService.handleRedirect(state, code, usagePointId)
 }

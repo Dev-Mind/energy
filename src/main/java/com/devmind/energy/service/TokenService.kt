@@ -5,6 +5,7 @@ import com.devmind.energy.service.dto.ApiException
 import com.devmind.energy.service.dto.EnedisTokenResponseDto
 import java.time.Clock
 import java.time.Instant
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestClient
@@ -18,6 +19,10 @@ class TokenService(
     private val properties: EnergyProperties,
     private val clock: Clock
 ) {
+    companion object {
+        private val logger = LoggerFactory.getLogger(TokenService::class.java)
+    }
+
     private var cachedToken: CachedToken? = null
 
     @get:Synchronized
@@ -56,7 +61,11 @@ class TokenService(
             }
             return response
         } catch (exception: RestClientResponseException) {
+            logger.error("Error while calling Enedis token endpoint: status={}", exception.statusCode.value(), exception)
             throw ApiException(exception.statusCode, exception.responseBodyAsString)
+        } catch (exception: Exception) {
+            logger.error("Unexpected error while calling Enedis token endpoint", exception)
+            throw exception
         }
     }
 
