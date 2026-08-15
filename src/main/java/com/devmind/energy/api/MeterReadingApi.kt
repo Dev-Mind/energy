@@ -42,24 +42,17 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
     fun getMeterData(
         @RequestParam prm: String,
         @RequestParam dataType: String,
-        @RequestParam startDate: String,
-        @RequestParam endDate: String
+        @RequestParam startDate: LocalDate,
+        @RequestParam endDate: LocalDate
     ): MeterReadingResponse? {
         val normalizedPrm = prm.trim()
         if (normalizedPrm.isEmpty()) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "prm must not be blank")
         }
 
-        val start = parseRequestedDate(startDate, "startDate")
-        val end = parseRequestedDate(endDate, "endDate")
-
-        if (end.isBefore(start)) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "endDate must be on or after startDate")
-        }
-
         return when (dataType.trim().lowercase()) {
-            "consumption" -> dataConnectService.getConsumptionLoadCurve(start, end, normalizedPrm)
-            "production" -> dataConnectService.getProductionLoadCurve(start, end, normalizedPrm)
+            "consumption" -> dataConnectService.getConsumptionLoadCurve(startDate, endDate, normalizedPrm)
+            "production" -> dataConnectService.getProductionLoadCurve(startDate, endDate, normalizedPrm)
             else -> throw ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "dataType must be consumption or production"
