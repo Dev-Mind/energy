@@ -22,6 +22,14 @@ class DataConnectService(
         private val logger = LoggerFactory.getLogger(DataConnectService::class.java)
     }
 
+    fun getDailyConsumption(start: LocalDate, end: LocalDate, usagePointId: String): MeterReadingResponse? {
+        return getMeterReading("/metering_data_clc/v5/daily_consumption", start, end, usagePointId)
+    }
+
+    fun getDailyProduction(start: LocalDate, end: LocalDate, usagePointId: String): MeterReadingResponse? {
+        return getMeterReading("/metering_data_clc/v5/daily_production", start, end, usagePointId)
+    }
+
     fun getConsumptionLoadCurve(start: LocalDate, end: LocalDate, usagePointId: kotlin.String): MeterReadingResponse? {
         return getMeterReading("/metering_data_clc/v5/consumption_load_curve", start, end, usagePointId)
     }

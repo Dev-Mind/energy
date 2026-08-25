@@ -20,6 +20,24 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         private val requestedDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-dd-MM")
     }
 
+    @GetMapping("/daily-consumption")
+    fun getDailyConsumption(
+        @RequestParam start: LocalDate,
+        @RequestParam end: LocalDate,
+        @RequestParam("usagePointId") usagePointId: String
+    ): MeterReadingResponse? {
+        return dataConnectService.getDailyConsumption(start, end, usagePointId)
+    }
+
+    @GetMapping("/daily-production")
+    fun getDailyProduction(
+        @RequestParam start: LocalDate,
+        @RequestParam end: LocalDate,
+        @RequestParam("usagePointId") usagePointId: String
+    ): MeterReadingResponse? {
+        return dataConnectService.getDailyProduction(start, end, usagePointId)
+    }
+
     @GetMapping("/consumption-load-curve")
     fun getConsumptionLoadCurve(
         @RequestParam start: LocalDate,
