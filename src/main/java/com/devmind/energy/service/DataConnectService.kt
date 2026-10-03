@@ -53,7 +53,8 @@ class DataConnectService(
     fun getUsagePointId(autorisationId: String): String {
         val response = postJson(
             SubscribedServicesResponse::class.java,
-            SubscribedServicesRequest(idAutorisation = autorisationId)
+            SubscribedServicesRequest(idAutorisation = autorisationId),
+            personneId = autorisationId
         ) { builder -> builder.path(properties.subscribedServicesPath).build() }
 
         val activePointIds = response.services
@@ -111,6 +112,7 @@ class DataConnectService(
     private fun <T : Any> postJson(
         responseType: Class<T>,
         request: Any,
+        personneId: String? = null,
         uriFunction: (UriBuilder) -> URI,
     ): T {
         try {
@@ -118,7 +120,12 @@ class DataConnectService(
                 .uri { uriFunction(it) }
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .headers { it.setBearerAuth(tokenService.accessToken) }
+                .headers { headers ->
+                    headers.setBearerAuth(tokenService.accessToken)
+                    if (!personneId.isNullOrBlank()) {
+                        headers.set("personneId", personneId)
+                    }
+                }
                 .body(request)
                 .retrieve()
                 .body(responseType)!!
