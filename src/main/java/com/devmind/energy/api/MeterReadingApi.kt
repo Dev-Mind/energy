@@ -106,7 +106,7 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         val usagePointId = dataConnectService.getUsagePointId(normalizedAutorisationId)
         logger.info("Resolved usagePointId={} for autorisationId={}", usagePointId, normalizedAutorisationId)
 
-        return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId, normalizedAutorisationId)
+        return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId)
     }
     @GetMapping("/usage-point")
     fun getUsagePointId(@RequestParam autorisationId: String): UsagePointResponse {
@@ -154,27 +154,26 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         dataType: String,
         startDate: LocalDate,
         endDate: LocalDate,
-        usagePointId: String,
-        personneId: String? = null
+        usagePointId: String
     ): MeterReadingResponse? =
         when (dataType.trim().lowercase()) {
             "consumption", "consumption_load_curve" ->
-                dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId, personneId)
+                dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId)
 
             "production", "production_load_curve" ->
-                dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId, personneId)
+                dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId)
 
             "daily_consumption" ->
-                dataConnectService.getDailyConsumption(startDate, endDate, usagePointId, personneId)
+                dataConnectService.getDailyConsumption(startDate, endDate, usagePointId)
 
             "daily_production" ->
-                dataConnectService.getDailyProduction(startDate, endDate, usagePointId, personneId)
+                dataConnectService.getDailyProduction(startDate, endDate, usagePointId)
 
             "index_consumption" ->
-                dataConnectService.getIndexConsumption(startDate, endDate, usagePointId, personneId)
+                dataConnectService.getIndexConsumption(startDate, endDate, usagePointId)
 
             "index_production" ->
-                dataConnectService.getIndexProduction(startDate, endDate, usagePointId, personneId)
+                dataConnectService.getIndexProduction(startDate, endDate, usagePointId)
 
             else -> {
                 logger.warn("getMeterReading rejected: unsupported dataType={}", dataType)
