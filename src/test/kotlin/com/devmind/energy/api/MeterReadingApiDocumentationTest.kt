@@ -154,6 +154,48 @@ class MeterReadingApiDocumentationTest {
     }
 
     @Test
+    fun `should resolve usage point from autorisation id and return consumption data`() {
+        every { dataConnectService.getUsagePointId("auth-123") } returns "12345678901234"
+        every {
+            dataConnectService.getConsumptionLoadCurve(
+                LocalDate.of(2026, 7, 24),
+                LocalDate.of(2026, 7, 25),
+                "12345678901234"
+            )
+        } returns sampleReadingResponse()
+
+        mockMvc.perform(
+            get("/api/enedis/metering/data-by-authorization")
+                .param("autorisationId", "auth-123")
+                .param("dataType", "consumption")
+                .param("startDate", "2026-24-07")
+                .param("endDate", "2026-25-07")
+        )
+            .andExpect(status().isOk)
+
+        verify(exactly = 1) { dataConnectService.getUsagePointId("auth-123") }
+        verify(exactly = 1) {
+            dataConnectService.getConsumptionLoadCurve(
+                LocalDate.of(2026, 7, 24),
+                LocalDate.of(2026, 7, 25),
+                "12345678901234"
+            )
+        }
+    }
+
+    @Test
+    fun `should reject blank autorisation id`() {
+        mockMvc.perform(
+            get("/api/enedis/metering/data-by-authorization")
+                .param("autorisationId", "  ")
+                .param("dataType", "consumption")
+                .param("startDate", "2026-24-07")
+                .param("endDate", "2026-25-07")
+        )
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
     fun `should reject invalid unified endpoint parameters`() {
         mockMvc.perform(
             get("/api/enedis/metering/data")

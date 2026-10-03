@@ -24,23 +24,20 @@
         <div class="card-body">
             <h2 class="h4 mb-3">Voir mes données</h2>
             <p class="text-body-secondary">
-                Saisissez votre PRM, le type de données souhaité et la période à interroger. Les dates doivent utiliser le
-                format <strong>YYYY-DD-MM</strong> (ex. 2026-24-07).
+                Saisissez votre identifiant d'autorisation (reçu lors de votre connexion à Enedis), le type de données
+                souhaité et la période à interroger. Les dates doivent utiliser le format <strong>YYYY-DD-MM</strong>
+                (ex. 2026-24-07).
             </p>
 
             <form id="meter-data-form" class="row g-3 mt-3 mb-3">
                 <div class="col-md-6">
-                    <label for="prm" class="form-label">Numéro de compteur (PRM)</label>
+                    <label for="autorisationId" class="form-label">Identifiant d'autorisation</label>
                     <input
-                        id="prm"
-                        name="prm"
+                        id="autorisationId"
+                        name="autorisationId"
                         class="form-control"
                         type="text"
-                        inputmode="numeric"
-                        pattern="[0-9]{14}"
-                        minlength="14"
-                        maxlength="14"
-                        placeholder="12345678901234"
+                        placeholder="ex. 7a1b2c3d-..."
                         required
                     >
                 </div>
@@ -262,14 +259,14 @@
         setLoading(true);
 
         const params = new URLSearchParams({
-            prm: document.getElementById('prm').value.trim(),
+            autorisationId: document.getElementById('autorisationId').value.trim(),
             dataType: document.getElementById('dataType').value,
             startDate: document.getElementById('startDate').value.trim(),
             endDate: document.getElementById('endDate').value.trim()
         });
 
         try {
-            const response = await fetch(`/api/enedis/metering/data?${params.toString()}`, {
+            const response = await fetch(`/api/enedis/metering/data-by-authorization?${params.toString()}`, {
                 headers: { Accept: 'application/json' }
             });
             const payload = await readResponseBody(response);
