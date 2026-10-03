@@ -65,7 +65,7 @@ class DataConnectService(
     fun getUsagePointId(autorisationId: String): String {
         val response = postJson(
             SubscribedServicesResponse::class.java,
-            SubscribedServicesRequest(autorisationId = autorisationId, comptage = true),
+            SubscribedServicesRequest(autorisationId = autorisationId, comptage = false),
             personneId = autorisationId
         ) { builder -> builder.path(properties.subscribedServicesPath).build() }
 

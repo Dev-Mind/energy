@@ -5,10 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 /**
  * Corps de la requete POST /subscribed_services/v1.
- * Seuls `autorisationId` et `comptage` sont obligatoires d'apres le guide Enedis.
+ *
+ * D'apres le guide Enedis, `etatCode`, `serviceType`, `comptage` et l'id d'autorisation sont
+ * obligatoires. Attention a `comptage` : `false` renvoie la liste des services, `true` ne renvoie
+ * que leur nombre (`nbTotalServices`) avec `serviceSouscrit` a null.
  */
 data class SubscribedServicesRequest(
     val autorisationId: String,
+    val etatCode: String = "ACTIF",
+    val serviceType: String = "ACCES",
     val comptage: Boolean = false
 )
 
@@ -36,8 +41,12 @@ data class SubscribedService(
     val etatLibelle: String? = null,
     val mesuresTypeCode: String? = null,
     val mesuresPas: String? = null,
+    val mesuresCorrigees: Boolean? = null,
+    val periodiciteTransmission: String? = null,
+    val espaceDynamique: String? = null,
     val dateDebut: String? = null,
     val dateFin: String? = null,
+    val sirenTitulaire: String? = null,
     val sirenBeneficiaire: String? = null,
     val publicationDonnees: Boolean? = null,
     val injection: Boolean? = null,

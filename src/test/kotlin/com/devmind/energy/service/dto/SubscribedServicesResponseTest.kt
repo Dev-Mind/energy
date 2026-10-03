@@ -30,4 +30,15 @@ class SubscribedServicesResponseTest {
         assertThat(response.services[0].pointId).isEqualTo("11111111111111")
         assertThat(response.services[0].etatCode).isEqualTo("ACTIF")
     }
+
+    @Test
+    fun `serializes the mandatory request fields`() {
+        val json = mapper.writeValueAsString(SubscribedServicesRequest(autorisationId = "88006"))
+
+        assertThat(json)
+            .contains("\"autorisationId\":\"88006\"")
+            .contains("\"etatCode\":\"ACTIF\"")
+            .contains("\"serviceType\":\"ACCES\"")
+            .contains("\"comptage\":false")
+    }
 }
