@@ -108,6 +108,21 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId)
     }
 
+    @GetMapping("/usage-point")
+    fun getUsagePointId(@RequestParam autorisationId: String): UsagePointResponse {
+        logger.info("getUsagePointId called: autorisationId={}", autorisationId)
+        val normalizedAutorisationId = autorisationId.trim()
+        if (normalizedAutorisationId.isEmpty()) {
+            logger.warn("getUsagePointId rejected: autorisationId must not be blank")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "autorisationId must not be blank")
+        }
+
+        val usagePointId = dataConnectService.getUsagePointId(normalizedAutorisationId)
+        logger.info("Resolved usagePointId={} for autorisationId={}", usagePointId, normalizedAutorisationId)
+
+        return UsagePointResponse(normalizedAutorisationId, usagePointId)
+    }
+
     private fun getMeterReading(
         dataType: String,
         startDate: LocalDate,
@@ -134,3 +149,8 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "$parameterName must use format YYYY-MM-DD")
         }
 }
+
+data class UsagePointResponse(
+    val autorisationId: String,
+    val usagePointId: String
+)
