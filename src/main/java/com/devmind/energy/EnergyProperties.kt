@@ -8,5 +8,9 @@ class EnergyProperties(
     var clientId: String,
     var duration: String,
     var secret: String,
-    var oauthPath: String
+    var oauthPath: String,
+    var authorizeUrl: String,
+    var subscribedServicesPath: String,
+    var meteringPath: String,
+    var applicationName: String
 )

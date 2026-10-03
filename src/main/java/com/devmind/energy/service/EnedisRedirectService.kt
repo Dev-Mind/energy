@@ -13,34 +13,34 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class EnedisRedirectService(
     private val properties: EnergyProperties,
-    private val clock: Clock
+    private val clock: Clock,
+    private val dataConnectService: DataConnectService,
+    private val stateService: EnedisStateService
 ) {
-    fun handleRedirect(state: String, code: String, usagePointId: String): EnedisRedirectResponseDto {
+    fun handleRedirect(state: String, autorisationId: String): EnedisRedirectResponseDto {
         val normalizedState = state.trim()
         if (normalizedState.isEmpty()) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "state must not be blank")
         }
+        stateService.consume(normalizedState)
 
-        val normalizedCode = code.trim()
-        if (normalizedCode.isEmpty()) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "code must not be blank")
-        }
-
-        val usagePointIds = usagePointId.split(';')
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .distinct()
-        if (usagePointIds.isEmpty()) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "usage_point_id must contain at least one PRM")
+        val normalizedAutorisationId = autorisationId.trim()
+        if (normalizedAutorisationId.isEmpty()) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "autorisation_id must not be blank")
         }
 
         val validFrom = Instant.now(clock)
         val validUntil = computeValidUntil(validFrom)
+        val usagePointId = try {
+            dataConnectService.getUsagePointId(normalizedAutorisationId)
+        } catch (exception: IllegalStateException) {
+            throw ResponseStatusException(HttpStatus.BAD_GATEWAY, exception.message, exception)
+        }
 
         return EnedisRedirectResponseDto(
             state = normalizedState,
-            code = normalizedCode,
-            usagePointIds = usagePointIds,
+            autorisationId = normalizedAutorisationId,
+            usagePointId = usagePointId,
             validFrom = validFrom,
             validUntil = validUntil
         )

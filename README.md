@@ -21,6 +21,10 @@ Defined in `src/main/resources/application.properties` through `energy.*` proper
 | `energy.client-id` | `HOME_AUTOMATION_ENEDIS_CLIENT_ID` | `replace-with-client-id` |
 | `energy.secret` | `HOME_AUTOMATION_ENEDIS_SECRET` | `replace-with-secret` |
 | `energy.oauth-path` | `HOME_AUTOMATION_ENEDIS_OAUTH_PATH` | `/oauth2/v3/token` |
+| `energy.authorize-url` | `HOME_AUTOMATION_ENEDIS_AUTHORIZE_URL` | `https://mon-compte-particulier.enedis.fr/dataconnect/v2/oauth2/authorize` |
+| `energy.subscribed-services-path` | `HOME_AUTOMATION_ENEDIS_SUBSCRIBED_SERVICES_PATH` | `/subscribed_services/v1` |
+| `energy.metering-path` | `HOME_AUTOMATION_ENEDIS_METERING_PATH` | `/mesure_synchrone_auto/v2` |
+| `energy.application-name` | `HOME_AUTOMATION_ENEDIS_APPLICATION_NAME` | `DEV-MIND ENERGY` |
 | `server.port` | — | `8085` |
 | `spring.datasource.url` | `ENERGY_DB_URL` | `jdbc:h2:file:./data/energy-users;AUTO_SERVER=TRUE` |
 | `spring.datasource.username` | `ENERGY_DB_USERNAME` | `sa` |
@@ -39,7 +43,8 @@ Base path: `https://localhost:8085`
 | Method | Path | Query params | Description |
 | --- | --- | --- | --- |
 | `GET` | `/api/enedis/token` | — | Returns current Enedis OAuth token (`access_token`, `scope`, `token_type`, `expires_in`). |
-| `GET` | `/api/enedis/redirect` | `state`, `usage_point_id`, `code` | Handles Enedis redirect callback, parses PRMs (`usage_point_id` separated by `;`) and returns the computed consent validity window. |
+| `GET` | `/api/enedis/account` | — | Redirects the client to the Enedis DataConnect v2 consent page. |
+| `GET` | `/api/enedis/redirect` | `state`, `autorisation_id` | Resolves the single PRM associated with the Enedis authorization and returns the computed consent validity window. |
 | `POST` | `/api/enedis/consents` | — | Creates or updates user consent data (`userAccountId`, consent flag, validity range, associated PRMs). |
 | `GET` | `/api/enedis/consents/{userAccountId}` | — | Returns consent data persisted for a user account. |
 | `GET` | `/api/enedis/customers/contracts` | `usagePointId` | Returns contracts for a usage point (mapped from Enedis customer contract payload). |
@@ -49,6 +54,8 @@ Base path: `https://localhost:8085`
 
 `start` and `end` are `LocalDate` values (ISO-8601, e.g. `2026-07-01`).
 `startDate` and `endDate` use the UI format `YYYY-DD-MM` (e.g. `2026-24-07`), and `dataType` must be `consumption` or `production`.
+
+The callback no longer accepts `usage_point_id` or `code`. Enedis now returns `autorisation_id`; the application retrieves the PRM server-side through `/subscribed_services/v1`.
 
 ## Run locally
 

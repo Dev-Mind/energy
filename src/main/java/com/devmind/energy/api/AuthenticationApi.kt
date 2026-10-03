@@ -2,6 +2,7 @@ package com.devmind.energy.api
 
 import com.devmind.energy.EnergyProperties
 import com.devmind.energy.service.EnedisRedirectService
+import com.devmind.energy.service.EnedisStateService
 import com.devmind.energy.service.TokenService
 import com.devmind.energy.service.dto.EnedisRedirectResponseDto
 import com.devmind.energy.service.dto.EnedisTokenResponseDto
@@ -10,13 +11,15 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.view.RedirectView
+import org.springframework.web.util.UriComponentsBuilder
 
 @RestController
 @RequestMapping("/api/enedis")
 class AuthenticationApi(
     private val tokenService: TokenService,
     private val properties: EnergyProperties,
-    private val enedisRedirectService: EnedisRedirectService
+    private val enedisRedirectService: EnedisRedirectService,
+    private val stateService: EnedisStateService
 ) {
     @GetMapping("/token")
     fun token(): EnedisTokenResponseDto =
@@ -24,19 +27,22 @@ class AuthenticationApi(
 
     @GetMapping("/account")
     fun redirectToEnedisAccount(): RedirectView {
-        val clientId = properties.clientId
-        val duration = properties.duration
-        val state = "XDEV123"
-        return RedirectView(
-            "https://mon-compte-particulier.enedis.fr/dataconnect/v1/oauth2/authorize?client_id=$clientId&duration=$duration&response_type=code&state=$state"
-        )
+        val state = stateService.create()
+        val target = UriComponentsBuilder.fromUriString(properties.authorizeUrl)
+            .queryParam("client_id", properties.clientId)
+            .queryParam("state", state)
+            .queryParam("duration", properties.duration)
+            .queryParam("response_type", "code")
+            .build()
+            .encode()
+            .toUriString()
+        return RedirectView(target)
     }
 
     @GetMapping("/redirect", "/refirect")
     fun handleEnedisRedirect(
         @RequestParam state: String,
-        @RequestParam("usage_point_id") usagePointId: String,
-        @RequestParam code: String
+        @RequestParam("autorisation_id") autorisationId: String
     ): EnedisRedirectResponseDto =
-        enedisRedirectService.handleRedirect(state, code, usagePointId)
+        enedisRedirectService.handleRedirect(state, autorisationId)
 }
