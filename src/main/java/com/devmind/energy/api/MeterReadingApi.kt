@@ -106,9 +106,8 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         val usagePointId = dataConnectService.getUsagePointId(normalizedAutorisationId)
         logger.info("Resolved usagePointId={} for autorisationId={}", usagePointId, normalizedAutorisationId)
 
-        return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId)
+        return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId, normalizedAutorisationId)
     }
-
     @GetMapping("/usage-point")
     fun getUsagePointId(@RequestParam autorisationId: String): UsagePointResponse {
         logger.info("getUsagePointId called: autorisationId={}", autorisationId)
@@ -155,11 +154,16 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         dataType: String,
         startDate: LocalDate,
         endDate: LocalDate,
-        usagePointId: String
+        usagePointId: String,
+        personneId: String? = null
     ): MeterReadingResponse? =
         when (dataType.trim().lowercase()) {
-            "consumption" -> dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId)
-            "production" -> dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId)
+            "consumption" ->
+                dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId, personneId)
+
+            "production" ->
+                dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId, personneId)
+
             else -> {
                 logger.warn("getMeterReading rejected: unsupported dataType={}", dataType)
                 throw ResponseStatusException(

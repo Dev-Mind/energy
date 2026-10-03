@@ -23,7 +23,25 @@ class ApiExceptionHandler {
         )
         return ResponseEntity.status(exception.statusCode)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(exception.responseBody)
+            .body(asJsonBody(exception))
+    }
+
+    /**
+     * Enedis ne renvoie pas toujours du JSON : un 500 de la passerelle se presente par exemple sous
+     * la forme du texte brut "500 Internal Server Error". On encapsule alors ce contenu pour que le
+     * client recoive un corps reellement exploitable.
+     */
+    private fun asJsonBody(exception: ApiException): String {
+        val body = exception.responseBody?.trim().orEmpty()
+        if (body.startsWith("{") || body.startsWith("[")) {
+            return body
+        }
+        val escaped = body.ifEmpty { "Aucun corps de reponse renvoye par Enedis" }
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", " ")
+            .replace("\r", " ")
+        return """{"status":${exception.statusCode.value()},"error":"Enedis","message":"$escaped"}"""
     }
 
     @ExceptionHandler(ResponseStatusException::class)
