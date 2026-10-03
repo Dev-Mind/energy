@@ -23,7 +23,9 @@ Defined in `src/main/resources/application.properties` through `energy.*` proper
 | `energy.oauth-path` | `HOME_AUTOMATION_ENEDIS_OAUTH_PATH` | `/oauth2/v3/token` |
 | `energy.authorize-url` | `HOME_AUTOMATION_ENEDIS_AUTHORIZE_URL` | `https://mon-compte-particulier.enedis.fr/dataconnect/v2/oauth2/authorize` |
 | `energy.subscribed-services-path` | `HOME_AUTOMATION_ENEDIS_SUBSCRIBED_SERVICES_PATH` | `/subscribed_services/v1` |
-| `energy.metering-path` | `HOME_AUTOMATION_ENEDIS_METERING_PATH` | `/mesure_synchrone_auto/v2` |
+| `energy.metering-path` | `HOME_AUTOMATION_ENEDIS_METERING_PATH` | `/mesure_synchrone_auto/v1` |
+| `energy.consumption-load-curve-path` | `HOME_AUTOMATION_ENEDIS_CONSUMPTION_LOAD_CURVE_PATH` | `/metering_data_clc/v5/consumption_load_curve` |
+| `energy.production-load-curve-path` | `HOME_AUTOMATION_ENEDIS_PRODUCTION_LOAD_CURVE_PATH` | `/metering_data_plc/v5/production_load_curve` |
 | `energy.application-name` | `HOME_AUTOMATION_ENEDIS_APPLICATION_NAME` | `DEV-MIND ENERGY` |
 | `server.port` | — | `8085` |
 | `spring.datasource.url` | `ENERGY_DB_URL` | `jdbc:h2:file:./data/energy-users;AUTO_SERVER=TRUE` |

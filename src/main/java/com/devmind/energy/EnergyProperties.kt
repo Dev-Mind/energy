@@ -12,5 +12,7 @@ class EnergyProperties(
     var authorizeUrl: String,
     var subscribedServicesPath: String,
     var meteringPath: String,
+    var consumptionLoadCurvePath: String,
+    var productionLoadCurvePath: String,
     var applicationName: String
 )
