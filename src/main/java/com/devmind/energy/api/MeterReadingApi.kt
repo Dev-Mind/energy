@@ -5,6 +5,7 @@ import com.devmind.energy.service.dto.MeterReadingResponse
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.LocalDate
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,7 +18,8 @@ import org.springframework.web.server.ResponseStatusException
 class MeterReadingApi(private val dataConnectService: DataConnectService) {
 
     companion object {
-        private val requestedDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-dd-MM")
+        private val logger = LoggerFactory.getLogger(MeterReadingApi::class.java)
+        private val requestedDateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
     }
 
     @GetMapping("/daily-consumption")
@@ -63,8 +65,13 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         @RequestParam startDate: String,
         @RequestParam endDate: String
     ): MeterReadingResponse? {
+        logger.info(
+            "getMeterData called: prm={}, dataType={}, startDate={}, endDate={}",
+            prm, dataType, startDate, endDate
+        )
         val normalizedPrm = prm.trim()
         if (normalizedPrm.isEmpty()) {
+            logger.warn("getMeterData rejected: prm must not be blank")
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "prm must not be blank")
         }
 
@@ -81,15 +88,22 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         @RequestParam startDate: String,
         @RequestParam endDate: String
     ): MeterReadingResponse? {
+        logger.info(
+            "getMeterDataByAuthorization called: autorisationId={}, dataType={}, startDate={}, endDate={}",
+            autorisationId, dataType, startDate, endDate
+        )
         val normalizedAutorisationId = autorisationId.trim()
         if (normalizedAutorisationId.isEmpty()) {
+            logger.warn("getMeterDataByAuthorization rejected: autorisationId must not be blank")
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "autorisationId must not be blank")
         }
 
         val parsedStartDate = parseRequestedDate(startDate, "startDate")
         val parsedEndDate = parseRequestedDate(endDate, "endDate")
 
+        logger.info("Resolving usagePointId for autorisationId={}", normalizedAutorisationId)
         val usagePointId = dataConnectService.getUsagePointId(normalizedAutorisationId)
+        logger.info("Resolved usagePointId={} for autorisationId={}", usagePointId, normalizedAutorisationId)
 
         return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId)
     }
@@ -103,16 +117,20 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         when (dataType.trim().lowercase()) {
             "consumption" -> dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId)
             "production" -> dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId)
-            else -> throw ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "dataType must be consumption or production"
-            )
+            else -> {
+                logger.warn("getMeterReading rejected: unsupported dataType={}", dataType)
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "dataType must be consumption or production"
+                )
+            }
         }
 
     private fun parseRequestedDate(value: String, parameterName: String): LocalDate =
         try {
             LocalDate.parse(value.trim(), requestedDateFormatter)
-        } catch (_: DateTimeParseException) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "$parameterName must use format YYYY-DD-MM")
+        } catch (exception: DateTimeParseException) {
+            logger.warn("Failed to parse {}={}: {}", parameterName, value, exception.message)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "$parameterName must use format YYYY-MM-DD")
         }
 }

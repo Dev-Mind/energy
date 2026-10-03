@@ -52,8 +52,8 @@ class MeterReadingApiDocumentationTest {
             get("/api/enedis/metering/data")
                 .param("prm", "12345678901234")
                 .param("dataType", "consumption")
-                .param("startDate", "2026-24-07")
-                .param("endDate", "2026-25-07")
+                .param("startDate", "2026-07-24")
+                .param("endDate", "2026-07-25")
                 .accept(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
@@ -63,8 +63,8 @@ class MeterReadingApiDocumentationTest {
                     queryParameters(
                         parameterWithName("prm").description("PRM / usage point identifier"),
                         parameterWithName("dataType").description("Requested data type: `consumption` or `production`"),
-                        parameterWithName("startDate").description("Start date using format `YYYY-DD-MM`"),
-                        parameterWithName("endDate").description("End date using format `YYYY-DD-MM`")
+                        parameterWithName("startDate").description("Start date using format `YYYY-MM-DD`"),
+                        parameterWithName("endDate").description("End date using format `YYYY-MM-DD`")
                     ),
                     responseFields(
                         fieldWithPath("meter_reading").description("Meter reading payload"),
@@ -91,8 +91,8 @@ class MeterReadingApiDocumentationTest {
                             .queryParameters(
                                 parameterWithName("prm").description("PRM / usage point identifier"),
                                 parameterWithName("dataType").description("Requested data type: `consumption` or `production`"),
-                                parameterWithName("startDate").description("Start date using format `YYYY-DD-MM`"),
-                                parameterWithName("endDate").description("End date using format `YYYY-DD-MM`")
+                                parameterWithName("startDate").description("Start date using format `YYYY-MM-DD`"),
+                                parameterWithName("endDate").description("End date using format `YYYY-MM-DD`")
                             )
                             .responseFields(
                                 fieldWithPath("meter_reading").description("Meter reading payload"),
@@ -139,8 +139,8 @@ class MeterReadingApiDocumentationTest {
             get("/api/enedis/metering/data")
                 .param("prm", "12345678901234")
                 .param("dataType", "production")
-                .param("startDate", "2026-24-07")
-                .param("endDate", "2026-25-07")
+                .param("startDate", "2026-07-24")
+                .param("endDate", "2026-07-25")
         )
             .andExpect(status().isOk)
 
@@ -168,8 +168,8 @@ class MeterReadingApiDocumentationTest {
             get("/api/enedis/metering/data-by-authorization")
                 .param("autorisationId", "auth-123")
                 .param("dataType", "consumption")
-                .param("startDate", "2026-24-07")
-                .param("endDate", "2026-25-07")
+                .param("startDate", "2026-07-24")
+                .param("endDate", "2026-07-25")
         )
             .andExpect(status().isOk)
 
@@ -189,8 +189,8 @@ class MeterReadingApiDocumentationTest {
             get("/api/enedis/metering/data-by-authorization")
                 .param("autorisationId", "  ")
                 .param("dataType", "consumption")
-                .param("startDate", "2026-24-07")
-                .param("endDate", "2026-25-07")
+                .param("startDate", "2026-07-24")
+                .param("endDate", "2026-07-25")
         )
             .andExpect(status().isBadRequest)
     }
@@ -201,8 +201,8 @@ class MeterReadingApiDocumentationTest {
             get("/api/enedis/metering/data")
                 .param("prm", "12345678901234")
                 .param("dataType", "invalid")
-                .param("startDate", "2026-24-07")
-                .param("endDate", "2026-25-07")
+                .param("startDate", "2026-07-24")
+                .param("endDate", "2026-07-25")
         )
             .andExpect(status().isBadRequest)
     }
