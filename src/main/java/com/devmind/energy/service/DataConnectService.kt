@@ -29,19 +29,29 @@ class DataConnectService(
     }
 
     fun getDailyConsumption(start: LocalDate, end: LocalDate, usagePointId: String): MeterReadingResponse? {
-        return getMeterReading("${properties.meteringPath}/consommation_quotidienne", start, end, usagePointId)
+        return getMeterReading("${properties.meteringPath}/metering_data/daily_consumption", start, end, usagePointId)
     }
 
     fun getDailyProduction(start: LocalDate, end: LocalDate, usagePointId: String): MeterReadingResponse? {
-        return getMeterReading("${properties.meteringPath}/production_quotidienne", start, end, usagePointId)
+        return getMeterReading("${properties.meteringPath}/metering_data/daily_production", start, end, usagePointId)
     }
 
     fun getConsumptionLoadCurve(start: LocalDate, end: LocalDate, usagePointId: kotlin.String): MeterReadingResponse? {
-        return getMeterReading("${properties.meteringPath}/courbe_de_charge_consommation", start, end, usagePointId)
+        return getMeterReading(
+            "${properties.meteringPath}/metering_data/consumption_load_curve",
+            start,
+            end,
+            usagePointId
+        )
     }
 
     fun getProductionLoadCurve(start: LocalDate, end: LocalDate, usagePointId: String): MeterReadingResponse? {
-        return getMeterReading("${properties.meteringPath}/courbe_de_charge_production", start, end, usagePointId)
+        return getMeterReading(
+            "${properties.meteringPath}/metering_data/production_load_curve",
+            start,
+            end,
+            usagePointId
+        )
     }
 
 
@@ -55,17 +65,17 @@ class DataConnectService(
     fun getUsagePointId(autorisationId: String): String {
         val response = postJson(
             SubscribedServicesResponse::class.java,
-            SubscribedServicesRequest(idAutorisation = autorisationId),
+            SubscribedServicesRequest(autorisationId = autorisationId, comptage = true),
             personneId = autorisationId
         ) { builder -> builder.path(properties.subscribedServicesPath).build() }
 
         logger.info(
             "subscribed_services returned nbTotalServices={} services={}",
             response.nbTotalServices,
-            response.services.map { "pointId=${it.pointId}/etatCode=${it.etatCode}/serviceCode=${it.serviceCode}" }
+            response.serviceSouscrit.map { "pointId=${it.pointId}/etatCode=${it.etatCode}/serviceCode=${it.serviceCode}" }
         )
 
-        val activePointIds = response.services
+        val activePointIds = response.serviceSouscrit
             .filter { it.etatCode == null || it.etatCode.equals("ACTIF", ignoreCase = true) }
             .mapNotNull { it.pointId }
             .distinct()
@@ -102,9 +112,9 @@ class DataConnectService(
         end: LocalDate,
         usagePointId: String
     ): UriBuilder =
-        queryParam("dateDebut", start)
-            .queryParam("dateFin", end)
-            .queryParam("pointId", usagePointId)
+        queryParam("start", start)
+            .queryParam("end", end)
+            .queryParam("usage_point_id", usagePointId)
 
     private fun <T : Any> getJson(
         responseType: Class<T>,
