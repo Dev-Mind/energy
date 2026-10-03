@@ -1,5 +1,6 @@
 package com.devmind.energy.service.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 /**
@@ -14,8 +15,17 @@ data class SubscribedServicesRequest(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SubscribedServicesResponse(
     val nbTotalServices: Int? = null,
-    val serviceSouscrit: List<SubscribedService> = emptyList()
-)
+    /**
+     * Enedis renvoie explicitement `"serviceSouscrit": null` lorsque l'autorisation n'a aucun
+     * service, ce qui interdit d'utiliser un type non-nullable ici : la valeur par defaut Kotlin
+     * ne s'applique pas quand la cle est presente dans le JSON.
+     */
+    val serviceSouscrit: List<SubscribedService>? = null
+) {
+    @get:JsonIgnore
+    val services: List<SubscribedService>
+        get() = serviceSouscrit.orEmpty()
+}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SubscribedService(

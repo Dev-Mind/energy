@@ -14,7 +14,7 @@ data class MeterReadingResponse(
         val end: String?,
         val quality: String?,
         val readingType: ReadingType?,
-        val intervalReading: List<IntervalReading>
+        val intervalReading: List<IntervalReading>? = null
     )
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
     data class ReadingType(
@@ -25,9 +25,9 @@ data class MeterReadingResponse(
     )
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
     data class IntervalReading(
-        val value: String,
-        val date: String,
-        val intervalLength: String,
-        val measureType: String
+        val value: String? = null,
+        val date: String? = null,
+        val intervalLength: String? = null,
+        val measureType: String? = null
     )
 }
