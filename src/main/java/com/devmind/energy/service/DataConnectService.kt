@@ -31,60 +31,79 @@ class DataConnectService(
     fun getDailyConsumption(
         start: LocalDate,
         end: LocalDate,
-        usagePointId: String,
-        personneId: String? = null
+        usagePointId: String
     ): MeterReadingResponse? {
         return getMeterReading(
             "${properties.meteringPath}/metering_data/daily_consumption",
             start,
             end,
-            usagePointId,
-            personneId
+            usagePointId
         )
     }
 
     fun getDailyProduction(
         start: LocalDate,
         end: LocalDate,
-        usagePointId: String,
-        personneId: String? = null
+        usagePointId: String
     ): MeterReadingResponse? {
         return getMeterReading(
             "${properties.meteringPath}/metering_data/daily_production",
             start,
             end,
-            usagePointId,
-            personneId
+            usagePointId
         )
     }
 
     fun getConsumptionLoadCurve(
         start: LocalDate,
         end: LocalDate,
-        usagePointId: String,
-        personneId: String? = null
+        usagePointId: String
     ): MeterReadingResponse? {
         return getMeterReading(
             "${properties.meteringPath}/metering_data/consumption_load_curve",
             start,
             end,
-            usagePointId,
-            personneId
+            usagePointId
         )
     }
 
     fun getProductionLoadCurve(
         start: LocalDate,
         end: LocalDate,
-        usagePointId: String,
-        personneId: String? = null
+        usagePointId: String
     ): MeterReadingResponse? {
         return getMeterReading(
             "${properties.meteringPath}/metering_data/production_load_curve",
             start,
             end,
-            usagePointId,
-            personneId
+            usagePointId
+        )
+    }
+
+
+    fun getIndexConsumption(
+        start: LocalDate,
+        end: LocalDate,
+        usagePointId: String
+    ): MeterReadingResponse? {
+        return getMeterReading(
+            "${properties.meteringPath}/metering_data/index_consumption",
+            start,
+            end,
+            usagePointId
+        )
+    }
+
+    fun getIndexProduction(
+        start: LocalDate,
+        end: LocalDate,
+        usagePointId: String
+    ): MeterReadingResponse? {
+        return getMeterReading(
+            "${properties.meteringPath}/metering_data/index_production",
+            start,
+            end,
+            usagePointId
         )
     }
 
@@ -152,10 +171,9 @@ class DataConnectService(
         path: String,
         start: LocalDate,
         end: LocalDate,
-        usagePointId: String,
-        personneId: String? = null
+        usagePointId: String
     ): MeterReadingResponse? =
-        getJson(MeterReadingResponse::class.java, personneId) { builder ->
+        getJson(MeterReadingResponse::class.java) { builder ->
             builder.path(path).addMeteringParams(start, end, usagePointId).build()
         }
 
@@ -170,7 +188,6 @@ class DataConnectService(
 
     private fun <T : Any> getJson(
         responseType: Class<T>,
-        personneId: String? = null,
         uriFunction: (UriBuilder) -> URI,
     ): T? {
         try {
@@ -179,9 +196,6 @@ class DataConnectService(
                 .accept(APPLICATION_JSON)
                 .headers { headers ->
                     headers.setBearerAuth(tokenService.accessToken)
-                    if (!personneId.isNullOrBlank()) {
-                        headers.set("personneId", personneId)
-                    }
                 }
                 .retrieve()
                 .body(responseType)

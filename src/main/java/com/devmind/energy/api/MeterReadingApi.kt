@@ -106,7 +106,7 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         val usagePointId = dataConnectService.getUsagePointId(normalizedAutorisationId)
         logger.info("Resolved usagePointId={} for autorisationId={}", usagePointId, normalizedAutorisationId)
 
-        return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId, normalizedAutorisationId)
+        return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId)
     }
     @GetMapping("/usage-point")
     fun getUsagePointId(@RequestParam autorisationId: String): UsagePointResponse {
@@ -154,21 +154,33 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         dataType: String,
         startDate: LocalDate,
         endDate: LocalDate,
-        usagePointId: String,
-        personneId: String? = null
+        usagePointId: String
     ): MeterReadingResponse? =
         when (dataType.trim().lowercase()) {
-            "consumption" ->
-                dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId, personneId)
+            "consumption", "consumption_load_curve" ->
+                dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId)
 
-            "production" ->
-                dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId, personneId)
+            "production", "production_load_curve" ->
+                dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId)
+
+            "daily_consumption" ->
+                dataConnectService.getDailyConsumption(startDate, endDate, usagePointId)
+
+            "daily_production" ->
+                dataConnectService.getDailyProduction(startDate, endDate, usagePointId)
+
+            "index_consumption" ->
+                dataConnectService.getIndexConsumption(startDate, endDate, usagePointId)
+
+            "index_production" ->
+                dataConnectService.getIndexProduction(startDate, endDate, usagePointId)
 
             else -> {
                 logger.warn("getMeterReading rejected: unsupported dataType={}", dataType)
                 throw ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "dataType must be consumption or production"
+                    "dataType doit valoir consumption, production, daily_consumption, " +
+                        "daily_production, index_consumption ou index_production"
                 )
             }
         }
