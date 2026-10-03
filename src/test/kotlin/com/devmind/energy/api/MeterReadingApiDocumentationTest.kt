@@ -160,7 +160,8 @@ class MeterReadingApiDocumentationTest {
             dataConnectService.getConsumptionLoadCurve(
                 LocalDate.of(2026, 7, 24),
                 LocalDate.of(2026, 7, 25),
-                "12345678901234"
+                "12345678901234",
+                "auth-123"
             )
         } returns sampleReadingResponse()
 
@@ -178,7 +179,8 @@ class MeterReadingApiDocumentationTest {
             dataConnectService.getConsumptionLoadCurve(
                 LocalDate.of(2026, 7, 24),
                 LocalDate.of(2026, 7, 25),
-                "12345678901234"
+                "12345678901234",
+                "auth-123"
             )
         }
     }

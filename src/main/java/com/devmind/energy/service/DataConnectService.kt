@@ -28,29 +28,63 @@ class DataConnectService(
         private val logger = LoggerFactory.getLogger(DataConnectService::class.java)
     }
 
-    fun getDailyConsumption(start: LocalDate, end: LocalDate, usagePointId: String): MeterReadingResponse? {
-        return getMeterReading("${properties.meteringPath}/metering_data/daily_consumption", start, end, usagePointId)
+    fun getDailyConsumption(
+        start: LocalDate,
+        end: LocalDate,
+        usagePointId: String,
+        personneId: String? = null
+    ): MeterReadingResponse? {
+        return getMeterReading(
+            "${properties.meteringPath}/metering_data/daily_consumption",
+            start,
+            end,
+            usagePointId,
+            personneId
+        )
     }
 
-    fun getDailyProduction(start: LocalDate, end: LocalDate, usagePointId: String): MeterReadingResponse? {
-        return getMeterReading("${properties.meteringPath}/metering_data/daily_production", start, end, usagePointId)
+    fun getDailyProduction(
+        start: LocalDate,
+        end: LocalDate,
+        usagePointId: String,
+        personneId: String? = null
+    ): MeterReadingResponse? {
+        return getMeterReading(
+            "${properties.meteringPath}/metering_data/daily_production",
+            start,
+            end,
+            usagePointId,
+            personneId
+        )
     }
 
-    fun getConsumptionLoadCurve(start: LocalDate, end: LocalDate, usagePointId: kotlin.String): MeterReadingResponse? {
+    fun getConsumptionLoadCurve(
+        start: LocalDate,
+        end: LocalDate,
+        usagePointId: String,
+        personneId: String? = null
+    ): MeterReadingResponse? {
         return getMeterReading(
             "${properties.meteringPath}/metering_data/consumption_load_curve",
             start,
             end,
-            usagePointId
+            usagePointId,
+            personneId
         )
     }
 
-    fun getProductionLoadCurve(start: LocalDate, end: LocalDate, usagePointId: String): MeterReadingResponse? {
+    fun getProductionLoadCurve(
+        start: LocalDate,
+        end: LocalDate,
+        usagePointId: String,
+        personneId: String? = null
+    ): MeterReadingResponse? {
         return getMeterReading(
             "${properties.meteringPath}/metering_data/production_load_curve",
             start,
             end,
-            usagePointId
+            usagePointId,
+            personneId
         )
     }
 
@@ -118,9 +152,10 @@ class DataConnectService(
         path: String,
         start: LocalDate,
         end: LocalDate,
-        usagePointId: String
+        usagePointId: String,
+        personneId: String? = null
     ): MeterReadingResponse? =
-        getJson(MeterReadingResponse::class.java) { builder ->
+        getJson(MeterReadingResponse::class.java, personneId) { builder ->
             builder.path(path).addMeteringParams(start, end, usagePointId).build()
         }
 
@@ -135,13 +170,19 @@ class DataConnectService(
 
     private fun <T : Any> getJson(
         responseType: Class<T>,
+        personneId: String? = null,
         uriFunction: (UriBuilder) -> URI,
     ): T? {
         try {
             return restClient.get()
-                .uri { uriFunction(it) }
+                .uri { builder -> uriFunction(builder).also { logger.info("Calling Enedis GET {}", it) } }
                 .accept(APPLICATION_JSON)
-                .headers { it.setBearerAuth(tokenService.accessToken) }
+                .headers { headers ->
+                    headers.setBearerAuth(tokenService.accessToken)
+                    if (!personneId.isNullOrBlank()) {
+                        headers.set("personneId", personneId)
+                    }
+                }
                 .retrieve()
                 .body(responseType)
         } catch (exception: RestClientResponseException) {
@@ -163,7 +204,7 @@ class DataConnectService(
     ): T {
         try {
             return restClient.post()
-                .uri { uriFunction(it) }
+                .uri { builder -> uriFunction(builder).also { logger.info("Calling Enedis POST {}", it) } }
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .headers { headers ->
