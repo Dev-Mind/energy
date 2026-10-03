@@ -72,10 +72,10 @@ class DataConnectService(
         logger.info(
             "subscribed_services returned nbTotalServices={} services={}",
             response.nbTotalServices,
-            response.serviceSouscrit.map { "pointId=${it.pointId}/etatCode=${it.etatCode}/serviceCode=${it.serviceCode}" }
+            response.services.map { "pointId=${it.pointId}/etatCode=${it.etatCode}/serviceCode=${it.serviceCode}" }
         )
 
-        val activePointIds = response.serviceSouscrit
+        val activePointIds = response.services
             .filter { it.etatCode == null || it.etatCode.equals("ACTIF", ignoreCase = true) }
             .mapNotNull { it.pointId }
             .distinct()
