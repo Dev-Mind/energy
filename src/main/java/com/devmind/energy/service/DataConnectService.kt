@@ -62,12 +62,29 @@ class DataConnectService(
                 .build()
         }
 
-    fun getUsagePointId(autorisationId: String): String {
-        val response = postJson(
+    fun getSubscribedServices(
+        autorisationId: String,
+        comptage: Boolean = false,
+        etatCode: String? = null,
+        serviceType: String? = null
+    ): SubscribedServicesResponse {
+        val request = SubscribedServicesRequest(
+            autorisationId = autorisationId,
+            comptage = comptage,
+            etatCode = etatCode,
+            serviceType = serviceType
+        )
+        logger.info("Calling subscribed_services with payload={}", request)
+
+        return postJson(
             SubscribedServicesResponse::class.java,
-            SubscribedServicesRequest(autorisationId = autorisationId, comptage = false),
+            request,
             personneId = autorisationId
         ) { builder -> builder.path(properties.subscribedServicesPath).build() }
+    }
+
+    fun getUsagePointId(autorisationId: String): String {
+        val response = getSubscribedServices(autorisationId)
 
         logger.info(
             "subscribed_services returned nbTotalServices={} services={}",

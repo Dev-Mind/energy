@@ -1,20 +1,25 @@
 package com.devmind.energy.service.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 /**
  * Corps de la requete POST /subscribed_services/v1.
  *
- * D'apres le guide Enedis, `etatCode`, `serviceType`, `comptage` et l'id d'autorisation sont
- * obligatoires. Attention a `comptage` : `false` renvoie la liste des services, `true` ne renvoie
- * que leur nombre (`nbTotalServices`) avec `serviceSouscrit` a null.
+ * `comptage` pilote la nature de la reponse : `false` renvoie la liste des services, `true` ne
+ * renvoie que leur nombre (`nbTotalServices`) avec `serviceSouscrit` a null.
+ *
+ * `etatCode` et `serviceType` sont documentes comme obligatoires dans le guide mais Enedis rejette
+ * la requete (400) lorsqu'ils sont envoyes avec les valeurs du guide. Ils sont donc facultatifs ici
+ * et omis du JSON quand ils valent null, ce qui permet de tester les deux variantes sans redeployer.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class SubscribedServicesRequest(
     val autorisationId: String,
-    val etatCode: String = "ACTIF",
-    val serviceType: String = "ACCES",
-    val comptage: Boolean = false
+    val comptage: Boolean = false,
+    val etatCode: String? = null,
+    val serviceType: String? = null
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
