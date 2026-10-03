@@ -60,7 +60,7 @@ class DataConnectService(
         usagePointId: String
     ): MeterReadingResponse? {
         return getMeterReading(
-            "${properties.meteringPath}/metering_data/consumption_load_curve",
+            properties.consumptionLoadCurvePath,
             start,
             end,
             usagePointId
@@ -73,7 +73,7 @@ class DataConnectService(
         usagePointId: String
     ): MeterReadingResponse? {
         return getMeterReading(
-            "${properties.meteringPath}/metering_data/production_load_curve",
+            properties.productionLoadCurvePath,
             start,
             end,
             usagePointId
