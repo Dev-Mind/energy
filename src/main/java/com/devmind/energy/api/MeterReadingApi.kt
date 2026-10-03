@@ -71,15 +71,43 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         val parsedStartDate = parseRequestedDate(startDate, "startDate")
         val parsedEndDate = parseRequestedDate(endDate, "endDate")
 
-        return when (dataType.trim().lowercase()) {
-            "consumption" -> dataConnectService.getConsumptionLoadCurve(parsedStartDate, parsedEndDate, normalizedPrm)
-            "production" -> dataConnectService.getProductionLoadCurve(parsedStartDate, parsedEndDate, normalizedPrm)
+        return getMeterReading(dataType, parsedStartDate, parsedEndDate, normalizedPrm)
+    }
+
+    @GetMapping("/data-by-authorization")
+    fun getMeterDataByAuthorization(
+        @RequestParam autorisationId: String,
+        @RequestParam dataType: String,
+        @RequestParam startDate: String,
+        @RequestParam endDate: String
+    ): MeterReadingResponse? {
+        val normalizedAutorisationId = autorisationId.trim()
+        if (normalizedAutorisationId.isEmpty()) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "autorisationId must not be blank")
+        }
+
+        val parsedStartDate = parseRequestedDate(startDate, "startDate")
+        val parsedEndDate = parseRequestedDate(endDate, "endDate")
+
+        val usagePointId = dataConnectService.getUsagePointId(normalizedAutorisationId)
+
+        return getMeterReading(dataType, parsedStartDate, parsedEndDate, usagePointId)
+    }
+
+    private fun getMeterReading(
+        dataType: String,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        usagePointId: String
+    ): MeterReadingResponse? =
+        when (dataType.trim().lowercase()) {
+            "consumption" -> dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId)
+            "production" -> dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId)
             else -> throw ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "dataType must be consumption or production"
             )
         }
-    }
 
     private fun parseRequestedDate(value: String, parameterName: String): LocalDate =
         try {
