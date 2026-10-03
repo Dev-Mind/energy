@@ -32,13 +32,24 @@ class SubscribedServicesResponseTest {
     }
 
     @Test
-    fun `serializes the mandatory request fields`() {
+    fun `omits the optional filters when they are not set`() {
         val json = mapper.writeValueAsString(SubscribedServicesRequest(autorisationId = "88006"))
 
         assertThat(json)
             .contains("\"autorisationId\":\"88006\"")
+            .contains("\"comptage\":false")
+            .doesNotContain("etatCode")
+            .doesNotContain("serviceType")
+    }
+
+    @Test
+    fun `serializes the optional filters when they are set`() {
+        val json = mapper.writeValueAsString(
+            SubscribedServicesRequest(autorisationId = "88006", etatCode = "ACTIF", serviceType = "ACCES")
+        )
+
+        assertThat(json)
             .contains("\"etatCode\":\"ACTIF\"")
             .contains("\"serviceType\":\"ACCES\"")
-            .contains("\"comptage\":false")
     }
 }

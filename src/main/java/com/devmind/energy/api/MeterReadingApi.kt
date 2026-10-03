@@ -2,6 +2,7 @@ package com.devmind.energy.api
 
 import com.devmind.energy.service.DataConnectService
 import com.devmind.energy.service.dto.MeterReadingResponse
+import com.devmind.energy.service.dto.SubscribedServicesResponse
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.LocalDate
@@ -121,6 +122,33 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         logger.info("Resolved usagePointId={} for autorisationId={}", usagePointId, normalizedAutorisationId)
 
         return UsagePointResponse(normalizedAutorisationId, usagePointId)
+    }
+
+    /**
+     * Appel brut de l'API Enedis services_souscrits, sans interpretation de la reponse.
+     *
+     * Les parametres `etatCode` et `serviceType` sont omis du corps de la requete lorsqu'ils ne
+     * sont pas renseignes : cela permet de comparer depuis Swagger la variante documentee dans le
+     * guide et la variante minimale acceptee par Enedis.
+     */
+    @GetMapping("/subscribed-services")
+    fun getSubscribedServices(
+        @RequestParam autorisationId: String,
+        @RequestParam(required = false, defaultValue = "false") comptage: Boolean,
+        @RequestParam(required = false) etatCode: String?,
+        @RequestParam(required = false) serviceType: String?
+    ): SubscribedServicesResponse {
+        val normalizedAutorisationId = autorisationId.trim()
+        if (normalizedAutorisationId.isEmpty()) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "autorisationId must not be blank")
+        }
+
+        return dataConnectService.getSubscribedServices(
+            autorisationId = normalizedAutorisationId,
+            comptage = comptage,
+            etatCode = etatCode?.trim()?.ifEmpty { null },
+            serviceType = serviceType?.trim()?.ifEmpty { null }
+        )
     }
 
     private fun getMeterReading(
