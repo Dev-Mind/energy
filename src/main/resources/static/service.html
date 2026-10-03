@@ -44,8 +44,12 @@
                 <div class="col-md-6">
                     <label for="dataType" class="form-label">Type de données</label>
                     <select id="dataType" name="dataType" class="form-select" required>
-                        <option value="consumption">Consommation</option>
-                        <option value="production">Production</option>
+                        <option value="consumption">Consommation (courbe de charge 30 min)</option>
+                        <option value="production">Production (courbe de charge 30 min)</option>
+                        <option value="daily_consumption">Consommation quotidienne</option>
+                        <option value="daily_production">Production quotidienne</option>
+                        <option value="index_consumption">Index de consommation</option>
+                        <option value="index_production">Index de production</option>
                     </select>
                 </div>
 
@@ -195,11 +199,17 @@
         rawResponse.textContent = '';
     }
 
+    function dataTypeLabel(value) {
+        const select = document.getElementById('dataType');
+        const option = Array.from(select.options).find((item) => item.value === value);
+        return option ? option.textContent : value;
+    }
+
     function renderSummaryRows(meterReading, requestedType) {
         const readingType = meterReading.reading_type || {};
         const rows = [
             ['PRM', meterReading.usage_point_id],
-            ['Type demandé', requestedType === 'production' ? 'Production' : 'Consommation'],
+            ['Type demandé', dataTypeLabel(requestedType)],
             ['Début', meterReading.start],
             ['Fin', meterReading.end],
             ['Qualité', meterReading.quality],

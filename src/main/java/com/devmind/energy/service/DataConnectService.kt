@@ -89,6 +89,37 @@ class DataConnectService(
     }
 
 
+    fun getIndexConsumption(
+        start: LocalDate,
+        end: LocalDate,
+        usagePointId: String,
+        personneId: String? = null
+    ): MeterReadingResponse? {
+        return getMeterReading(
+            "${properties.meteringPath}/metering_data/index_consumption",
+            start,
+            end,
+            usagePointId,
+            personneId
+        )
+    }
+
+    fun getIndexProduction(
+        start: LocalDate,
+        end: LocalDate,
+        usagePointId: String,
+        personneId: String? = null
+    ): MeterReadingResponse? {
+        return getMeterReading(
+            "${properties.meteringPath}/metering_data/index_production",
+            start,
+            end,
+            usagePointId,
+            personneId
+        )
+    }
+
+
     fun getContracts(usagePointId: String): ContractSummaryResponse? =
         getJson(ContractSummaryResponse::class.java) { builder ->
             builder.path("/synth_contrat_auto/v1")

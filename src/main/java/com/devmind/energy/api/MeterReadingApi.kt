@@ -158,17 +158,30 @@ class MeterReadingApi(private val dataConnectService: DataConnectService) {
         personneId: String? = null
     ): MeterReadingResponse? =
         when (dataType.trim().lowercase()) {
-            "consumption" ->
+            "consumption", "consumption_load_curve" ->
                 dataConnectService.getConsumptionLoadCurve(startDate, endDate, usagePointId, personneId)
 
-            "production" ->
+            "production", "production_load_curve" ->
                 dataConnectService.getProductionLoadCurve(startDate, endDate, usagePointId, personneId)
+
+            "daily_consumption" ->
+                dataConnectService.getDailyConsumption(startDate, endDate, usagePointId, personneId)
+
+            "daily_production" ->
+                dataConnectService.getDailyProduction(startDate, endDate, usagePointId, personneId)
+
+            "index_consumption" ->
+                dataConnectService.getIndexConsumption(startDate, endDate, usagePointId, personneId)
+
+            "index_production" ->
+                dataConnectService.getIndexProduction(startDate, endDate, usagePointId, personneId)
 
             else -> {
                 logger.warn("getMeterReading rejected: unsupported dataType={}", dataType)
                 throw ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "dataType must be consumption or production"
+                    "dataType doit valoir consumption, production, daily_consumption, " +
+                        "daily_production, index_consumption ou index_production"
                 )
             }
         }
