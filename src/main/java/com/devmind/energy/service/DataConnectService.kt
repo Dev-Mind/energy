@@ -9,10 +9,12 @@ import com.devmind.energy.service.dto.SubscribedServicesResponse
 import java.net.URI
 import java.time.LocalDate
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientResponseException
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.UriBuilder
 
 
@@ -57,14 +59,29 @@ class DataConnectService(
             personneId = autorisationId
         ) { builder -> builder.path(properties.subscribedServicesPath).build() }
 
+        logger.info(
+            "subscribed_services returned nbTotalServices={} services={}",
+            response.nbTotalServices,
+            response.services.map { "pointId=${it.pointId}/etatCode=${it.etatCode}/serviceCode=${it.serviceCode}" }
+        )
+
         val activePointIds = response.services
             .filter { it.etatCode == null || it.etatCode.equals("ACTIF", ignoreCase = true) }
             .mapNotNull { it.pointId }
             .distinct()
 
-        if (activePointIds.size != 1) {
-            throw IllegalStateException(
-                "Expected exactly one active usage point for authorization, got ${activePointIds.size}"
+        if (activePointIds.isEmpty()) {
+            throw ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Aucun point de livraison actif n'est associe a l'autorisation $autorisationId. " +
+                    "Verifiez que l'autorisation est toujours valide et que le compteur est ouvert aux services."
+            )
+        }
+        if (activePointIds.size > 1) {
+            throw ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "L'autorisation $autorisationId est associee a ${activePointIds.size} points de livraison actifs " +
+                    "($activePointIds). Utilisez l'endpoint /api/enedis/metering/data avec un PRM explicite."
             )
         }
         return activePointIds.single()
@@ -103,6 +120,8 @@ class DataConnectService(
         } catch (exception: RestClientResponseException) {
             logger.error("Error while calling Enedis endpoint: status={}", exception.statusCode.value(), exception)
             throw ApiException(exception.statusCode, exception.responseBodyAsString)
+        } catch (exception: ResponseStatusException) {
+            throw exception
         } catch (exception: Exception) {
             logger.error("Unexpected error while calling Enedis endpoint", exception)
             throw exception
@@ -128,10 +147,16 @@ class DataConnectService(
                 }
                 .body(request)
                 .retrieve()
-                .body(responseType)!!
+                .body(responseType)
+                ?: throw ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Reponse vide recue depuis l'API Enedis (${responseType.simpleName})"
+                )
         } catch (exception: RestClientResponseException) {
             logger.error("Error while calling Enedis endpoint: status={}", exception.statusCode.value(), exception)
             throw ApiException(exception.statusCode, exception.responseBodyAsString)
+        } catch (exception: ResponseStatusException) {
+            throw exception
         } catch (exception: Exception) {
             logger.error("Unexpected error while calling Enedis endpoint", exception)
             throw exception
