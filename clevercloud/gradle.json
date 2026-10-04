@@ -1,8 +1,10 @@
 {
   "build": {
+    "type": "gradle",
     "goal": "assemble"
   },
   "deploy": {
-    "jarName": "build/libs/jar"
+    "goal": "assemble",
+    "jarName": "build/libs/energy-0.0.1-SNAPSHOT.jar"
   }
 }
