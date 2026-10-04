@@ -3,6 +3,6 @@
     "goal": "assemble"
   },
   "deploy": {
-    "goal": "bootRun"
+    "jarName": "build/libs/jar"
   }
 }
