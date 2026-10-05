@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 class ApiExceptionHandler {
@@ -42,6 +43,24 @@ class ApiExceptionHandler {
             .replace("\n", " ")
             .replace("\r", " ")
         return """{"status":${exception.statusCode.value()},"error":"Enedis","message":"$escaped"}"""
+    }
+
+    /**
+     * Requetes pour des ressources statiques inexistantes (ex: appsettings.json, favicon.ico)
+     * generees par des scanners ou des navigateurs. On renvoie un 404 silencieux plutot
+     * qu'un 500 bruyamment logue en erreur.
+     */
+    @ExceptionHandler(NoResourceFoundException::class)
+    fun handleNoResourceFoundException(exception: NoResourceFoundException): ResponseEntity<Map<String, Any>> {
+        logger.debug("No static resource found: {}", exception.resourcePath)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(
+                mapOf(
+                    "status" to HttpStatus.NOT_FOUND.value(),
+                    "message" to "Resource not found"
+                )
+            )
     }
 
     @ExceptionHandler(ResponseStatusException::class)
