@@ -19,8 +19,11 @@ class BotProbeFilter : OncePerRequestFilter() {
     companion object {
         private val BLOCKED_PATTERN = Regex(
             "(?i).*(wp-admin|wp-login|wp-content|wp-includes|xmlrpc\\.php|\\.php$|" +
-                "\\.env$|\\.git/|phpmyadmin|phpunit|\\.aws/credentials|vendor/.*\\.php|" +
-                "appsettings\\.json$|config\\.json$|\\.well-known/security\\.txt).*"
+                "(^|/)\\.?env(\\.[a-z0-9_-]+)?(\\.txt)?$|\\.git/|phpmyadmin|phpunit|\\.aws/|" +
+                "appsettings(\\.[a-z]+)?\\.json$|(^|/)config(\\.(json|js|ya?ml|ini))?$|" +
+                "(^|/)(auth|composer|package|credentials)\\.json$|aws-exports\\.js$|" +
+                "(^|/)credentials(\\.[a-z]+)?$|(^|/)aws\\.ya?ml$|\\.(sql|bak|ini)$|" +
+                "\\.well-known/security\\.txt).*"
         )
     }
 
